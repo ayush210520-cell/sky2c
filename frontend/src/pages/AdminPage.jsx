@@ -193,17 +193,23 @@ export function AdminPage() {
           <div>
             <strong style={{ color: '#b91c1c' }}>Backend not connected</strong>
             <p style={{ margin: '8px 0 0', color: '#991b1b' }}>{listError}</p>
-            <p style={{ margin: '8px 0 0', fontSize: 14 }}>
-              Start backend: <code style={{ background: '#fee2e2', padding: '2px 6px', borderRadius: 4 }}>cd backend && npm run dev</code>
-              <br />
-              Backend runs on port 5001. In <code style={{ background: '#fee2e2', padding: '2px 6px', borderRadius: 4 }}>frontend/.env</code> set <code style={{ background: '#fee2e2', padding: '2px 6px', borderRadius: 4 }}>VITE_API_URL=http://localhost:5001/api</code> then restart frontend.
-            </p>
+            {(/(failed to fetch|network|reset)/i.test(String(listError)) && (import.meta.env.VITE_API_URL || '').includes('onrender.com')) ? (
+              <p style={{ margin: '8px 0 0', fontSize: 14 }}>
+                Production backend (Render) thodi der so raha ho sakta hai. Pehle <a href="https://sky2c.onrender.com/api/health" target="_blank" rel="noopener" style={{ color: '#2563eb' }}>health check</a> kholo (1 min wait karke refresh), phir yahan <strong>Refresh</strong> karo. Bar-bar na sote iske liye UptimeRobot se <code style={{ background: '#fef3c7', padding: '2px 6px', borderRadius: 4 }}>https://sky2c.onrender.com/api/health</code> har 5 min ping karo.
+              </p>
+            ) : (
+              <p style={{ margin: '8px 0 0', fontSize: 14 }}>
+                Start backend: <code style={{ background: '#fee2e2', padding: '2px 6px', borderRadius: 4 }}>cd backend && npm run dev</code>
+                <br />
+                Backend runs on port 5001. In <code style={{ background: '#fee2e2', padding: '2px 6px', borderRadius: 4 }}>frontend/.env</code> set <code style={{ background: '#fee2e2', padding: '2px 6px', borderRadius: 4 }}>VITE_API_URL=http://localhost:5001/api</code> then restart frontend.
+              </p>
+            )}
             <button
               type="button"
-              onClick={() => window.open((import.meta.env.VITE_API_URL || 'http://localhost:5001/api').replace(/\/api\/?$/, '') + '/api/shipments', '_blank')}
+              onClick={() => window.open((import.meta.env.VITE_API_URL || 'http://localhost:5001/api').replace(/\/api\/?$/, '') + '/api/health', '_blank')}
               style={{ marginTop: 12, padding: '8px 16px', background: '#dc2626', color: 'white', border: 'none', borderRadius: 6, cursor: 'pointer' }}
             >
-              Open API in new tab (test)
+              Open API health in new tab (test)
             </button>
           </div>
         )}

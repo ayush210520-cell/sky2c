@@ -25,11 +25,14 @@ const PORT = process.env.PORT || 5001;
 const frontendUrls = process.env.FRONTEND_URL
   ? process.env.FRONTEND_URL.split(',').map((u) => u.trim()).filter(Boolean)
   : [];
+const normalizeOrigin = (u) => (u ? String(u).replace(/\/+$/, '') : '');
 const corsOptions = frontendUrls.length > 0
   ? {
       origin: (origin, cb) => {
         if (!origin) return cb(null, true);
-        if (frontendUrls.includes(origin)) return cb(null, origin);
+        const o = normalizeOrigin(origin);
+        const allowed = frontendUrls.map(normalizeOrigin);
+        if (allowed.includes(o)) return cb(null, origin);
         return cb(null, false);
       },
       credentials: true,
