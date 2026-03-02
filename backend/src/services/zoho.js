@@ -18,6 +18,20 @@ function isEnabled() {
   return (enabled === 'true' || enabled === '1') && hasCreds;
 }
 
+/** For debugging: which Zoho env checks pass (no secrets exposed). */
+export function getZohoStatus() {
+  const raw = String(process.env.ZOHO_INTEGRATION_ENABLED || '').trim().toLowerCase();
+  return {
+    enabled: isEnabled(),
+    checks: {
+      integrationEnabled: raw === 'true' || raw === '1',
+      hasClientId: !!(process.env.ZOHO_CLIENT_ID && String(process.env.ZOHO_CLIENT_ID).trim().length > 0),
+      hasClientSecret: !!(process.env.ZOHO_CLIENT_SECRET && String(process.env.ZOHO_CLIENT_SECRET).trim().length > 0),
+      hasRefreshToken: !!(process.env.ZOHO_REFRESH_TOKEN && String(process.env.ZOHO_REFRESH_TOKEN).trim().length > 0),
+    },
+  };
+}
+
 /**
  * Fetch new access token from Zoho (refresh_token use karke).
  */

@@ -3,7 +3,7 @@
  * One-time setup: open auth URL → login → callback exchanges code for refresh_token.
  */
 import { Router } from 'express';
-import { getRefreshTokenFromCode, getLeads, getDeals, isZohoEnabled } from '../services/zoho.js';
+import { getRefreshTokenFromCode, getLeads, getDeals, isZohoEnabled, getZohoStatus } from '../services/zoho.js';
 
 const router = Router();
 const REDIRECT_URI = process.env.ZOHO_REDIRECT_URI || 'http://localhost:5001/api/zoho/callback';
@@ -100,6 +100,14 @@ router.post('/exchange-code', async (req, res) => {
   } catch (err) {
     return res.status(400).json({ error: err.message || 'Exchange failed' });
   }
+});
+
+/**
+ * GET /api/zoho/status
+ * Debug: dikhata hai Render par kaunse Zoho env set hain (values nahi, sirf pass/fail).
+ */
+router.get('/status', (req, res) => {
+  res.json(getZohoStatus());
 });
 
 /**
