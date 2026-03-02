@@ -1,0 +1,21 @@
+{
+  "name": "logistics-shipment-backend",
+  "version": "1.0.0",
+  "description": "Shipment tracking backend - Node.js + Express + Google Sheets",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "cron": "node src/jobs/cron.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "googleapis": "^144.0.0",
+    "node-cron": "^3.0.3",
+    "nodemailer": "^6.9.14",
+    "uuid": "^10.0.0"
+  }
+}
