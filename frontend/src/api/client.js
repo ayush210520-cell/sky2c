@@ -23,15 +23,22 @@ export async function api(method, path, body = null) {
     return data;
   };
 
+  const isNetworkError = (e) =>
+    method === 'GET' && (e?.name === 'TypeError' || /failed|reset|network/i.test(String(e?.message || '')));
+
   try {
     return await doFetch();
   } catch (err) {
-    // Render free tier: connection reset when service was sleeping. Retry once after 4s.
-    if ((method === 'GET' && /failed|reset|network/i.test(String(err?.message))) || err?.name === 'TypeError') {
-      await sleep(4000);
+    if (!isNetworkError(err)) throw err;
+    // Render free tier: wake-up can take 30–60s. Retry twice with longer waits.
+    try {
+      await sleep(6000);
+      return await doFetch();
+    } catch (err2) {
+      if (!isNetworkError(err2)) throw err2;
+      await sleep(15000);
       return await doFetch();
     }
-    throw err;
   }
 }
 
