@@ -21,23 +21,23 @@ process.on('uncaughtException', (err) => {
 const app = express();
 const PORT = process.env.PORT || 5001;
 
-// CORS: allow FRONTEND_URL; comma-separated = multiple origins (e.g. http://localhost:5173,https://sky2c.vercel.app)
+// CORS: allow FRONTEND_URL; comma-separated = multiple origins. Production fallback: allow sky2c.vercel.app
 const frontendUrls = process.env.FRONTEND_URL
   ? process.env.FRONTEND_URL.split(',').map((u) => u.trim()).filter(Boolean)
   : [];
 const normalizeOrigin = (u) => (u ? String(u).replace(/\/+$/, '') : '');
-const corsOptions = frontendUrls.length > 0
-  ? {
-      origin: (origin, cb) => {
-        if (!origin) return cb(null, true);
-        const o = normalizeOrigin(origin);
-        const allowed = frontendUrls.map(normalizeOrigin);
-        if (allowed.includes(o)) return cb(null, origin);
-        return cb(null, false);
-      },
-      credentials: true,
-    }
-  : { origin: true };
+const PRODUCTION_ORIGIN = 'https://sky2c.vercel.app';
+const corsOptions = {
+  origin: (origin, cb) => {
+    if (!origin) return cb(null, true);
+    const o = normalizeOrigin(origin);
+    const allowed = frontendUrls.map(normalizeOrigin);
+    if (allowed.includes(o)) return cb(null, origin);
+    if (process.env.NODE_ENV === 'production' && o === normalizeOrigin(PRODUCTION_ORIGIN)) return cb(null, origin);
+    return cb(null, false);
+  },
+  credentials: true,
+};
 app.use(cors(corsOptions));
 app.use(express.json());
 
