@@ -1,0 +1,12 @@
+# Render.com – Backend deploy
+# Connect repo ke baad Dashboard → Service → Settings → Root Directory = backend (zaroor set karo)
+services:
+  - type: web
+    name: logistics-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production

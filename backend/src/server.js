@@ -10,10 +10,32 @@ import { geocodeRoutes } from './routes/geocode.js';
 import { zohoRoutes } from './routes/zoho.js';
 import { startCronJobs } from './jobs/cron.js';
 
+// Prevent process crash on unhandled errors (e.g. in Zoho fetch)
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+});
+
 const app = express();
 const PORT = process.env.PORT || 5001;
 
-app.use(cors({ origin: process.env.FRONTEND_URL || '*' }));
+// CORS: allow FRONTEND_URL; comma-separated = multiple origins (e.g. http://localhost:5173,https://sky2c.vercel.app)
+const frontendUrls = process.env.FRONTEND_URL
+  ? process.env.FRONTEND_URL.split(',').map((u) => u.trim()).filter(Boolean)
+  : [];
+const corsOptions = frontendUrls.length > 0
+  ? {
+      origin: (origin, cb) => {
+        if (!origin) return cb(null, true);
+        if (frontendUrls.includes(origin)) return cb(null, origin);
+        return cb(null, false);
+      },
+      credentials: true,
+    }
+  : { origin: true };
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Health check

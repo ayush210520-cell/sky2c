@@ -63,7 +63,8 @@ export function ZohoCrmPage() {
       const res = await api.getLeads(nextStepOnly);
       setLeads(Array.isArray(res.data) ? res.data : []);
     } catch (e) {
-      setError(e.message || 'Failed to load leads');
+      const msg = e.message || 'Failed to load leads';
+      setError(msg + (/(failed|reset|network|fetch)/i.test(msg) ? ' — Backend (Render) thodi der so raha ho sakta hai. 30 sec baad Refresh try karo.' : ''));
       setLeads([]);
     } finally {
       setLoading(false);
@@ -77,7 +78,8 @@ export function ZohoCrmPage() {
       const res = await api.getDeals(nextStepOnly);
       setDeals(Array.isArray(res.data) ? res.data : []);
     } catch (e) {
-      setError(e.message || 'Failed to load deals');
+      const msg = e.message || 'Failed to load deals';
+      setError(msg + (/(failed|reset|network|fetch)/i.test(msg) ? ' — Backend (Render) thodi der so raha ho sakta hai. 30 sec baad Refresh try karo.' : ''));
       setDeals([]);
     } finally {
       setLoading(false);

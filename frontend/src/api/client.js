@@ -4,6 +4,8 @@
  */
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
 export async function api(method, path, body = null) {
   const url = path.startsWith('http') ? path : `${API_BASE}${path}`;
   const opts = {
@@ -13,10 +15,24 @@ export async function api(method, path, body = null) {
   if (body && (method === 'POST' || method === 'PATCH' || method === 'PUT')) {
     opts.body = JSON.stringify(body);
   }
-  const res = await fetch(url, opts);
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.error || data.message || res.statusText);
-  return data;
+
+  const doFetch = async () => {
+    const res = await fetch(url, opts);
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || data.message || res.statusText);
+    return data;
+  };
+
+  try {
+    return await doFetch();
+  } catch (err) {
+    // Render free tier: connection reset when service was sleeping. Retry once after 4s.
+    if ((method === 'GET' && /failed|reset|network/i.test(String(err?.message))) || err?.name === 'TypeError') {
+      await sleep(4000);
+      return await doFetch();
+    }
+    throw err;
+  }
 }
 
 export const shipments = {
