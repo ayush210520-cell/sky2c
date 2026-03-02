@@ -12,10 +12,10 @@ const CRM_API_BASE = `https://www.${CRM_DOMAIN}/crm/v2`;
 let cachedToken = null; // { access_token, expiresAt }
 
 function isEnabled() {
-  return process.env.ZOHO_INTEGRATION_ENABLED === 'true' &&
-    process.env.ZOHO_CLIENT_ID &&
-    process.env.ZOHO_CLIENT_SECRET &&
-    process.env.ZOHO_REFRESH_TOKEN;
+  const enabled = String(process.env.ZOHO_INTEGRATION_ENABLED || '').trim().toLowerCase();
+  const hasCreds = [process.env.ZOHO_CLIENT_ID, process.env.ZOHO_CLIENT_SECRET, process.env.ZOHO_REFRESH_TOKEN]
+    .every((v) => v && String(v).trim().length > 0);
+  return (enabled === 'true' || enabled === '1') && hasCreds;
 }
 
 /**

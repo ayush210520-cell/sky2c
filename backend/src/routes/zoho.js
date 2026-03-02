@@ -107,7 +107,12 @@ router.post('/exchange-code', async (req, res) => {
  * Query: next_step=1 – only non-converted (next step) leads.
  */
 router.get('/leads', async (req, res) => {
-  if (!isZohoEnabled()) return res.status(400).json({ error: 'Zoho integration not enabled' });
+  if (!isZohoEnabled()) {
+    return res.status(400).json({
+      error: 'Zoho integration not enabled',
+      hint: 'On Render: set ZOHO_INTEGRATION_ENABLED=true and ZOHO_CLIENT_ID, ZOHO_CLIENT_SECRET, ZOHO_REFRESH_TOKEN, then redeploy.',
+    });
+  }
   try {
     const nextStepOnly = req.query.next_step === '1' || req.query.next_step === 'true';
     const data = await getLeads(nextStepOnly);
@@ -122,7 +127,12 @@ router.get('/leads', async (req, res) => {
  * Query: next_step=1 – only deals not in closed stages.
  */
 router.get('/deals', async (req, res) => {
-  if (!isZohoEnabled()) return res.status(400).json({ error: 'Zoho integration not enabled' });
+  if (!isZohoEnabled()) {
+    return res.status(400).json({
+      error: 'Zoho integration not enabled',
+      hint: 'On Render: set ZOHO_INTEGRATION_ENABLED=true and ZOHO_CLIENT_ID, ZOHO_CLIENT_SECRET, ZOHO_REFRESH_TOKEN, then redeploy.',
+    });
+  }
   try {
     const nextStepOnly = req.query.next_step === '1' || req.query.next_step === 'true';
     const data = await getDeals(nextStepOnly);
